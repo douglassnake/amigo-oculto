@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amigo Oculto - Consulta</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#d60000,#006b1b);
+      margin: 0;
+      padding: 20px;
+      color: #fff;
+    }
+    .top-bar{
+      text-align: center;
+      font-weight: bold;
+      font-size: 22px;
+      padding: 10px 0;
+      background: #b30000;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .container{
+      max-width: 600px;
+      margin: auto;
+      background: rgba(255,255,255,0.9);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    h2{
+      text-align: center;
+      font-size: 28px;
+      color: #b30000;
+      text-shadow: 1px 1px 2px #fff;
+      margin-top: 0;
+    }
+    p{
+      color: #555;
+      font-size: 18px;
+    }
+    input, button, select{
+      width: 100%;
+      padding: 14px;
+      margin-top: 14px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 20px;
+    }
+    button{
+      background: #b30000;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    button:hover{
+      background: #7a0000;
+    }
+    #resultado{
+      margin-top: 18px;
+      font-size: 22px;
+      color: #0a7a20;
+      text-align: center;
+    }
+    #aviso{
+      margin-top: 10px;
+      font-size: 16px;
+      color: #b30000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">🎄 Amigo Oculto da Família 🎁</div>
+
+<div class="container" id="busca">
+  <h2>Consulte seu Amigo Oculto</h2>
+  <p id="labelNome">Selecione seu nome (cada participante só pode consultar <b>uma vez</b> neste link):</p>
+  <select id="selectNome">
+    <option value="">-- Selecione seu nome --</option>
+  </select>
+  <button onclick="verResultado()">Ver meu amigo oculto</button>
+  <h3 id="resultado"></h3>
+  <p id="aviso"></p>
+</div>
+
+<script>
+  // Lista fixa de participantes
+  const participantes = [
+    "Antônio Furtado","Maria Luzia","Talita","Rones","Regina",
+    "Leonardo Fraga","Pietro","Maria Rita","Cecília","Daniel",
+    "Davi","Helena","Catarina","Nelson","Renata",
+    "Luiz","Maria do Amparo","Osmar","Divina","Silvana",
+    "Miguel","Douglas","João Miguel","Chaiene","Rodrigo Souza",
+    "Luna","Mateus","Leuzinha","Eliana","Zé Davi",
+    "Leonardo","Milena","Ricardo","Larissa","Ana Fraga"
+  ];
+
+  // Mapa fixo do sorteio já realizado
+  const amigos = {
+    "Antônio Furtado":"Leuzinha",
+    "Maria Luzia":"Helena",
+    "Talita":"Mateus",
+    "Rones":"Leonardo Fraga",
+    "Regina":"Catarina",
+    "Leonardo Fraga":"Milena",
+    "Pietro":"Maria do Amparo",
+    "Maria Rita":"Larissa",
+    "Cecília":"Osmar",
+    "Daniel":"Silvana",
+    "Davi":"Talita",
+    "Helena":"Douglas",
+    "Catarina":"Davi",
+    "Nelson":"Rodrigo Souza",
+    "Renata":"Chaiene",
+    "Luiz":"Luna",
+    "Maria do Amparo":"Antônio Furtado",
+    "Osmar":"Pietro",
+    "Divina":"Zé Davi",
+    "Silvana":"João Miguel",
+    "Miguel":"Regina",
+    "Douglas":"Luiz",
+    "João Miguel":"Renata",
+    "Chaiene":"Cecília",
+    "Rodrigo Souza":"Rones",
+    "Luna":"Maria Luzia",
+    "Mateus":"Divina",
+    "Leuzinha":"Daniel",
+    "Eliana":"Nelson",
+    "Zé Davi":"Eliana",
+    "Leonardo":"Miguel",
+    "Milena":"Ana Fraga",
+    "Ricardo":"Maria Rita",
+    "Larissa":"Ricardo",
+    "Ana Fraga":"Leonardo"
+  };
+
+  // Token único por pessoa (id -> nome)
+  const tokens = {
+    "af12x9":"Antônio Furtado",
+    "ml88p3":"Maria Luzia",
+    "ta41k2":"Talita",
+    "ro73m5":"Rones",
+    "re99c1":"Regina",
+    "lf20z7":"Leonardo Fraga",
+    "pi55v4":"Pietro",
+    "mr31b6":"Maria Rita",
+    "ce68h2":"Cecília",
+    "da24n8":"Daniel",
+    "dv77q9":"Davi",
+    "he36t1":"Helena",
+    "ca82f5":"Catarina",
+    "ne53l4":"Nelson",
+    "rn11a2":"Renata",
+    "lz44u7":"Luiz",
+    "ma27d3":"Maria do Amparo",
+    "os19r6":"Osmar",
+    "di60v8":"Divina",
+    "si05s9":"Silvana",
+    "mi18g4":"Miguel",
+    "dg90s2":"Douglas",
+    "jm72m1":"João Miguel",
+    "ch14e3":"Chaiene",
+    "rs29z5":"Rodrigo Souza",
+    "lu63n7":"Luna",
+    "mt21e6":"Mateus",
+    "le70z8":"Leuzinha",
+    "el40a9":"Eliana",
+    "zd16d1":"Zé Davi",
+    "ln57o2":"Leonardo",
+    "ml32n4":"Milena",
+    "rc13r5":"Ricardo",
+    "la26s6":"Larissa",
+    "af45g7":"Ana Fraga"
+  };
+
+  // Controle de quem já consultou (no navegador)
+  const consultados = {};
+
+  // Preenche o select ao carregar a página
+  window.onload = function(){
+    const select = document.getElementById("selectNome");
+    const label = document.getElementById("labelNome");
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (id && tokens[id]) {
+      // Modo link individual: nome travado
+      const nome = tokens[id];
+      const opt = document.createElement("option");
+      opt.value = nome;
+      opt.textContent = nome;
+      select.innerHTML = "";
+      select.appendChild(opt);
+      select.value = nome;
+      select.disabled = true;
+      label.innerHTML = "Seu nome já está selecionado 👇";
+    } else {
+      // Modo geral: todos os nomes liberados (se você quiser usar)
+      participantes.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        select.appendChild(opt);
+      });
+    }
+  };
+
+  function verResultado(){
+    const select = document.getElementById("selectNome");
+    const nome = select.value;
+    const resultadoEl = document.getElementById("resultado");
+    const avisoEl = document.getElementById("aviso");
+
+    resultadoEl.innerHTML = "";
+    avisoEl.innerHTML = "";
+
+    if(!nome){
+      avisoEl.textContent = "Por favor, selecione seu nome na lista.";
+      return;
+    }
+
+    if(consultados[nome]){
+      avisoEl.textContent = "Este nome já consultou o amigo oculto. Cada participante só pode ver uma vez neste dispositivo.";
+      return;
+    }
+
+    const amigo = amigos[nome];
+    if(!amigo){
+      avisoEl.textContent = "Não foi possível localizar seu amigo oculto. Fale com o organizador.";
+      return;
+    }
+
+    consultados[nome] = true;
+    resultadoEl.innerHTML = `Seu amigo oculto é:<br><b>${amigo}</b>`;
+    avisoEl.innerHTML = "Guarde essa informação em segredo 🤫";
+  }
+</script>
+
+</body>
+</html>
