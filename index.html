@@ -89,7 +89,7 @@
 </div>
 
 <script>
-  // Lista fixa de participantes
+  // Lista de participantes (usada apenas no modo geral, sem ?id=)
   const participantes = [
     "Antônio Furtado","Maria Luzia","Talita","Rones","Regina",
     "Leonardo Fraga","Pietro","Maria Rita","Cecília","Daniel",
@@ -97,10 +97,11 @@
     "Luiz","Maria do Amparo","Osmar","Divina","Silvana",
     "Miguel","Douglas","João Miguel","Chaiene","Rodrigo Souza",
     "Luna","Mateus","Leuzinha","Eliana","Zé Davi",
-    "Leonardo","Milena","Ricardo","Larissa","Ana Fraga"
+    "Leonardo","Milena","Ricardo","Larissa","Ana Fraga",
+    "Ray","Matheus (Larissa)"
   ];
 
-  // Mapa fixo do sorteio já realizado
+  // Mapa fixo do sorteio principal
   const amigos = {
     "Antônio Furtado":"Leuzinha",
     "Maria Luzia":"Helena",
@@ -136,7 +137,11 @@
     "Milena":"Ana Fraga",
     "Ricardo":"Maria Rita",
     "Larissa":"Ricardo",
-    "Ana Fraga":"Leonardo"
+    "Ana Fraga":"Leonardo",
+
+    // Mini-sorteio isolado
+    "Ray":"Matheus (Larissa)",
+    "Matheus (Larissa)":"Ray"
   };
 
   // Token único por pessoa (id -> nome)
@@ -175,13 +180,17 @@
     "ml32n4":"Milena",
     "rc13r5":"Ricardo",
     "la26s6":"Larissa",
-    "af45g7":"Ana Fraga"
+    "af45g7":"Ana Fraga",
+
+    // novos:
+    "ry55k9":"Ray",
+    "mlh72x":"Matheus (Larissa)"
   };
 
-  // Controle de quem já consultou (no navegador)
+  // Controle local de quem já consultou (no dispositivo)
   const consultados = {};
 
-  // Preenche o select ao carregar a página
+  // Preenche o select ao carregar
   window.onload = function(){
     const select = document.getElementById("selectNome");
     const label = document.getElementById("labelNome");
@@ -200,7 +209,7 @@
       select.disabled = true;
       label.innerHTML = "Seu nome já está selecionado 👇";
     } else {
-      // Modo geral: todos os nomes liberados (se você quiser usar)
+      // Modo geral: todos os nomes liberados (útil para teste)
       participantes.forEach(p => {
         const opt = document.createElement("option");
         opt.value = p;
